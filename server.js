@@ -5,7 +5,7 @@ const cors =require('cors');
 const PORT = 4000;
 const mongoose =require('mongoose');
 const RecordRoutes =express.Router();
-let Record = require('./hallOfFame.model');
+let Records = require('./hallOfFame.model');
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -22,7 +22,7 @@ connection.once('open',function(){
 app.use('/records',RecordRoutes);
 //to handle requists comming to same route
 RecordRoutes.route('/').get(function(req,res){
-    Record.find(function(err,records){
+    Records.find(function(err,records){
         if(err)
             console.log(err);
         else{
@@ -34,19 +34,31 @@ RecordRoutes.route('/').get(function(req,res){
     //maybe not used now but i will keep it for later
     RecordRoutes.route('/:id').get(function(req,res){
         let id=req.params.id;
-        Record.findById(id,function(err,record){
+        Records.findById(id,function(err,record){
             res.json(record);
         });
     });
-
+    //deleting a record
+    RecordRoutes.route('/delete').post(function(req,res){
+        let id= req.body.id;
+        console.log(id);
+        Records.deleteOne({_id:id}).then(res=>{
+            console.log(res);
+        })
+        .catch(err=>{
+            console.log(err);
+        })
+    })
     // adding record
     RecordRoutes.route('/add').post(function(req,res){
-        let record =new Record(req.body);
+        let record =new Records(req.body);
+        console.log(record);
         record.save()
         .then(record =>{
             res.status(200).json({'record':'record added successfuly'});
         })
         .catch(err =>{
+            console.log(err);
             res.status(400).send('adding new recored failed');
         });
     });

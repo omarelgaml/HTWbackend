@@ -4,7 +4,6 @@ const Schema = mongoose.Schema;
 let Record = new Schema({
     name:{
         type:String,
-        required:true,        
     },
     grade:{
         type:Number,
