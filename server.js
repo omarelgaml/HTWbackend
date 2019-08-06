@@ -16,6 +16,11 @@ const connection =mongoose.connection;
 connection.once('open',function(){
     console.log("connection to database established is successfully ");
 });
+
+/*
+     This is crone job library from node, the code inside it will be excuted on the first day of each month to insert
+     the first three of the current month in the topThrees table and clear the table of the current month ranking
+*/     
 var monthlyTask = cron.schedule('0 0 1 * *', () => {
     Records.find()
     .then(res=>{
@@ -44,7 +49,9 @@ monthlyTask.start();
 //this to distnguish routes
 app.use('/records',RecordRoutes);
 app.use('/topThrees',TopThreesRoutes);
-//to handle requists comming to same route
+
+
+//getting all the records in the hallOfFame table
 RecordRoutes.route('/').get(function(req,res){
     Records.find(function(err,records){
         if(err)
@@ -54,6 +61,8 @@ RecordRoutes.route('/').get(function(req,res){
         }
     });
 });
+
+//getting all the record in the topThrees table
 TopThreesRoutes.route('/').get(function(req,res){
     topThreesRecords.find(function(err,records){
         if(err)
@@ -64,13 +73,6 @@ TopThreesRoutes.route('/').get(function(req,res){
     });
 });
 
-//maybe not used now but i will keep it for later
-RecordRoutes.route('/:id').get(function(req,res){
-    let id=req.params.id;
-    Records.findById(id,function(err,record){
-        res.json(record);
-    });
-});
 //deleting a record
 RecordRoutes.route('/delete').post(function(req,res){
     let id= req.body.id;
